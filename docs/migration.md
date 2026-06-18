@@ -1,7 +1,7 @@
 Migrate from `distutils.setup` to `py2exe.freeze`
 ===================
 
-`py2exe` v0.12.0.0 introduced a new `freeze` API for using the software and deprecated the former `distutils.setup` and `setup.py py2exe` interfaces. Both these interfaces will be removed in the next major release of `py2exe` (see [PEP 632](https://peps.python.org/pep-0632), [the setuptools documentation](https://setuptools.pypa.io/en/latest/userguide/extension.html#final-remarks) and issue #127 for further information about this decision).
+`py2exe` v0.12.0.0 introduced a new `freeze` API for using the software and deprecated the former `distutils.setup` and `setup.py py2exe` interfaces. These interfaces have now been **removed**: the `build_exe` (`-m py2exe`) CLI was dropped in v0.13.0.0, and the `distutils` / `setup.py py2exe` interface was removed in v0.14.1.0 (see [PEP 632](https://peps.python.org/pep-0632), [the setuptools documentation](https://setuptools.pypa.io/en/latest/userguide/extension.html#final-remarks) and issue #127 for further information about this decision). The `freeze` API is now the only supported entry point.
 
 This document includes suggestion on how to migrate your existing freezing code to the new `freeze` API. Documentation for `freeze` is available [here](https://github.com/py2exe/py2exe/blob/master/docs/py2exe.freeze.md).
 
@@ -36,4 +36,3 @@ A few details on how to go from a `setup` call to `freeze`:
 - The `includes`, `excludes`, `packages`, and `dll_excludes` options should now be lists instead of comma-separated strings. The current syntax is still supported, but will be removed in the future.
 - The `version_info` dictionary supports writing some information in the Properties of the frozen executable. This feature, despite advertised, was not working with older versions of `py2exe`. If you intend to use this feature, please convert your freezing script to the new API.
 - All the other `distutils`-specific arguments, including but not limited to `name`, `author`, `version`, `url`, etc., are not supported by `freeze` and will raise `TypeError` if passed. Please remove these extra arguments from a call to `freeze` as `py2exe` is not designed to use them.
-
