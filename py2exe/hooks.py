@@ -850,12 +850,18 @@ def hook_scipy(finder, module):
             for dll in dlls:
                 finder.add_dll(dll)
 
-    if scp_version >= pkgversion.parse('1.14.0'):
+    if pkgversion.parse('1.14.0') <= scp_version < pkgversion.parse('1.18.0'):
         depth = getattr(finder, "recursion_depth_scipy_lib_array_api_compact_numpy_fft", 0)
         if depth == 0:
             finder.recursion_depth_scipy_lib_array_api_compact_numpy_fft = depth + 1
             finder.import_hook("scipy._lib.array_api_compat.numpy.fft")
             finder.recursion_depth_scipy_lib_array_api_compact_numpy_fft = depth
+    elif scp_version >= pkgversion.parse('1.18.0'):
+        depth = getattr(finder, "recursion_depth_scipy_external_array_api_compact_numpy_fft", 0)
+        if depth == 0:
+            finder.recursion_depth_scipy_external_array_api_compact_numpy_fft = depth + 1
+            finder.import_hook("scipy._external.array_api_compat.numpy.fft")
+            finder.recursion_depth_scipy_external_array_api_compact_numpy_fft = depth
 
 
 def hook_scipy_special(finder, module):
@@ -901,6 +907,18 @@ def hook_scipy_optimize(finder, module):
         finder.import_hook("scipy.optimize.minpack2")
         finder.import_hook("scipy")
         finder.recursion_depth_optimize = depth
+
+
+def hook_scipy__external_array_api_compat_numpy(finder, module):
+    import ast
+    tree = ast.parse(module.__source__)
+
+    assign_node = ast.Assign(targets=[ast.Name(id='__package__', ctx=ast.Store())], value=ast.Constant(value='scipy._external.array_api_compat.numpy'))
+    tree.body.insert(0, assign_node)
+    ast.fix_missing_locations(tree)
+
+    module.__code_object__ = compile(tree, module.__file__, "exec", optimize=module.__optimize__)
+
 
 def hook_scipy__lib_array_api_compat_numpy(finder, module):
     import ast
