@@ -8,6 +8,7 @@ import pkgutil
 import shutil
 import struct
 import sys
+import warnings
 import zipfile
 
 from argparse import Namespace
@@ -21,6 +22,13 @@ from .versioninfo import Version
 from .icons import BuildIcons
 
 logger = logging.getLogger("runtime")
+
+DEPRECATION_MESSAGE_CTYPES_COMDLL = """
+The `ctypes_comdll` target type is deprecated and will be removed in the next
+major release.
+
+See https://github.com/py2exe/py2exe/issues/217 for further information.
+"""
 
 from importlib.machinery import EXTENSION_SUFFIXES
 if '_d.pyd' in EXTENSION_SUFFIXES:
@@ -191,6 +199,7 @@ class Runtime(object):
 
         for target in self.targets:
             if target.exe_type == "ctypes_comdll":
+                warnings.warn(DEPRECATION_MESSAGE_CTYPES_COMDLL, DeprecationWarning, stacklevel=2)
                 mf.import_hook("_ctypes")
             target.analyze(mf)
             modules = getattr(target, "modules", [])

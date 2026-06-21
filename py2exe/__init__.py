@@ -11,8 +11,23 @@ See https://github.com/py2exe/py2exe/discussions/157 for further
 information.
 """
 
+DEPRECATION_MESSAGE_BUNDLE_FILES = """
+The `bundle_files` option with a value of 2 or lower is deprecated and will be
+removed in the next major release.
+
+See https://github.com/py2exe/py2exe/discussions/246 for further information.
+"""
+
+DEPRECATION_MESSAGE_ZIPFILE_NONE = """
+Setting `zipfile=None` (attaching the library archive to the executable itself)
+is deprecated and will be removed in the next major release.
+
+See https://github.com/py2exe/py2exe/discussions/246 for further information.
+"""
+
 import logging
 import sys
+import warnings
 
 from argparse import Namespace
 
@@ -21,7 +36,6 @@ from .version import __version__
 
 is_64bits = sys.maxsize > 2**32
 if not is_64bits:
-    import warnings
     warnings.warn(DEPRECATION_MESSAGE_WIN32, DeprecationWarning, stacklevel=2)
 
 
@@ -59,7 +73,8 @@ def freeze(console=[], windows=[], service=[], data_files=None, zipfile="library
         zipfile (str): target path of the archive that will contain all the Python
             packages and modules required by the frozen bundle.
             If this parameter is set to `None`, the archive will be attached
-            to the target executable file.
+            to the target executable file. [WARNING: setting `None` is deprecated
+            and will be removed in the next major release.]
         options (dict): options used to configure and customize the bundle.
             Supported values are listed below.
         version_info (dict): version strings and other information can be attached
@@ -116,8 +131,9 @@ def freeze(console=[], windows=[], service=[], data_files=None, zipfile="library
             copied into the directory where the zipfile or the EXE/DLL files
             are created, and loaded in the normal way.
 
-    **WARNING**: the following values are not supported in Python 3.12+! See
-    https://github.com/py2exe/py2exe/issues/225 for further details.
+    **WARNING**: the following values are now deprecated and will be removed in the
+    next major release. See https://github.com/py2exe/py2exe/discussions/246 for
+    further information.
 
         bundle_files == 2: Extension modules are put into the library ziparchive and loaded
             from it directly. The Python DLL and any other needed DLLs are copied into the
@@ -181,6 +197,12 @@ def freeze(console=[], windows=[], service=[], data_files=None, zipfile="library
     # support the old dictionary structure with a global 'py2exe' key
     if 'py2exe' in options:
         options = options['py2exe']
+
+    if options.get("bundle_files", 3) <= 2:
+        warnings.warn(DEPRECATION_MESSAGE_BUNDLE_FILES, DeprecationWarning, stacklevel=2)
+
+    if zipfile is None:
+        warnings.warn(DEPRECATION_MESSAGE_ZIPFILE_NONE, DeprecationWarning, stacklevel=2)
 
     runtime_options = Namespace(
                         compress = options.get("compressed", 0),
