@@ -13,6 +13,16 @@ Changes
 
 The detailed changelog is published on [GitHub](https://github.com/py2exe/py2exe/releases/).
 
+Version 0.14.2.0:
+- Reintroduce Windows Service freezing in `freeze` with the `service=` argument
+- Deprecate `bundle_files<3` and `zipfile=None`. Both these options  will be removed
+  in the next major release. See discussion [#246](https://github.com/py2exe/py2exe/discussions/246)
+  for further details.
+- (Officially) deprecate target `ctypes_comdll`. This target will be removed
+  in the next major release. See issue [#217](https://github.com/py2exe/py2exe/issues/217)
+  for further details.
+- Fix hook for `scipy`.
+
 Version 0.14.1.1:
 - Fix hook for `pyphen`
 - Add `packaging` to the runtime dependencies
